@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Qibo",
+    "slug": "Qibo",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "icon": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.render.qibo",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.render.qibo",
+      "versionCode": 2,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c8e4a808-46c4-47df-864c-9aebcbbcc316"
+      }
+    }
+  }
+}
