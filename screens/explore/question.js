@@ -6,6 +6,8 @@ import { Colors, Fonts, Sizes, } from "../../constants/styles";
 import { MaterialIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
 import { Feather } from '@expo/vector-icons';
+import { useAtom } from "jotai";
+import userInfoAtom from "../../store/userInfo";
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +15,8 @@ const questionList = ['Where you energetic?', 'Did you get tired easily?', 'Ques
 const answerList = ['None', 'Rarely', 'Sometimes', 'Often', 'Always']
 
 const QuestionScreen = ({ navigation }) => {
+
+    const [userInfo, setUserInfo] = useAtom(userInfoAtom)
 
     const [state, setState] = useState({
         pageTitle: questionList[0],
@@ -58,12 +62,12 @@ const QuestionScreen = ({ navigation }) => {
                 style={styles.headerWrapStyle}
              >
                 <View style={styles.profileContainer}>
-                    <Image source={require('../../assets/images/profile-photo.png')} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     <View style={{marginTop: Sizes.fixPadding * 2.0, flexDirection: 'row'}}>
                         <Text style={{...Fonts.darkRedColor24Regular}}>Hi, </Text>
-                        <Text style={{...Fonts.darkRedColor24Bold}}>Sarah!</Text>
+                        <Text style={{...Fonts.darkRedColor24Bold}}>{userInfo.userCredential._tokenResponse.displayName}!</Text>
                     </View>
                     <Text style={{...Fonts.darkRedColor15Light}}>Answer the questions to complete</Text>
                     <View style={{flexDirection: 'row'}}>

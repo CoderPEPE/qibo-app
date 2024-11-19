@@ -4,10 +4,13 @@ import * as Progress from 'react-native-progress';
 import { Colors, Fonts, Sizes, } from "../../constants/styles";
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useAtom } from "jotai";
+import userInfoAtom from "../../store/userInfo";
 
 const { width } = Dimensions.get('window');
 
 const ExploreScreen = ({ navigation }) => {
+    const [userInfo, setUserInfo] = useAtom(userInfoAtom)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
@@ -35,11 +38,11 @@ const ExploreScreen = ({ navigation }) => {
         return (
             <View style={styles.headerWrapStyle}>
                 <View style={styles.profileContainer}>
-                    <Image source={require('../../assets/images/profile-photo.png')} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     <Text style={{ ...Fonts.blackColor24Medium}}>Good Morning,</Text>
-                    <Text style={{marginTop: -5, ...Fonts.blackColor24Bold}}>Sarah!</Text>
+                    <Text style={{marginTop: -5, ...Fonts.blackColor24Bold}}>{userInfo.userCredential._tokenResponse.displayName}!</Text>
                 </View>
                 <View style={styles.boltContainer}>
                     <MaterialIcons
@@ -75,7 +78,6 @@ const ExploreScreen = ({ navigation }) => {
     }
 
     function learningInfo() {
-
         return (
             <View>
                 <View style={styles.titleWrapStyle}>
@@ -91,12 +93,12 @@ const ExploreScreen = ({ navigation }) => {
                 >
                     <View style={styles.learningContainer}>
                         <Text style={{...Fonts.pinkColor18Bold,}}>Completed </Text>
-                        <Text style={{...Fonts.pinkColor18Bold,}}>09/</Text>
+                        <Text style={{...Fonts.pinkColor18Bold,}}>01/</Text>
                         <Text style={{...Fonts.pinkColor18Bold,}}>15</Text>
                     </View>
                     <View style={{marginBottom: Sizes.fixPadding * 1, marginTop: Sizes.fixPadding * 1}}>
                         <Progress.Bar
-                            progress={0.68}
+                            progress={0.07}
                             width={Sizes.fixPadding * 20}
                             height={Sizes.fixPadding * 1.3}
                             color={Colors.whiteColor}
