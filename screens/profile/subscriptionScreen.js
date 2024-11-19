@@ -89,7 +89,6 @@ const subscriptionScreen = ({ navigation }) => {
                 <View key={`${item.id}`}>
                     <TouchableOpacity
                         activeOpacity={0.9}
-                        onPress={() => navigation.push('ExploreSubscription')}
                     >
                         <ImageBackground
                             source={require('../../assets/images/card-design.png')}

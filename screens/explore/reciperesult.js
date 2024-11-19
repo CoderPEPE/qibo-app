@@ -4,10 +4,14 @@ import * as Progress from 'react-native-progress';
 import { Colors, Fonts, Sizes, } from "../../constants/styles";
 import { MaterialIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
+import { useAtom } from "jotai";
+import userInfoAtom from "../../store/userInfo";
 
 const { height: screenHeight } = Dimensions.get('window');
 
 const RecipeResult = ({ navigation }) => {
+
+    const [userInfo, setUserInfo] = useAtom(userInfoAtom)
 
     const [state, setState] = useState({
         currentScreen: 0,
@@ -68,7 +72,7 @@ const RecipeResult = ({ navigation }) => {
             <View style={styles.headerWrapStyle}>
                 <Entypo name="chevron-thin-left" size={22} style={{marginLeft: -5, marginRight: 20}} color="black" onPress={() => {currentScreen != 0 ? updateState({currentScreen : 0}) : navigation.push('BottomTabBar', {pageView : 'main'})}}/>
                 <View style={styles.profileContainer}>
-                    <Image source={require('../../assets/images/profile-photo.png')} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     <Text style={{marginTop: -15, ...Fonts.blackColor24ExtraBold}}>Recipes</Text>

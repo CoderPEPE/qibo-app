@@ -4,10 +4,14 @@ import * as Progress from 'react-native-progress';
 import { Colors, Fonts, Sizes, } from "../../constants/styles";
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import userInfoAtom from "../../store/userInfo";
+import { useAtom } from "jotai";
 
 const { width } = Dimensions.get('window');
 
 const ProfileScreen = ({ navigation }) => {
+
+    const [userInfo, setUserInfo] = useAtom(userInfoAtom)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
@@ -33,11 +37,11 @@ const ProfileScreen = ({ navigation }) => {
         return (
             <View style={styles.headerWrapStyle}>
                 <View style={styles.profileContainer}>
-                    <Image source={require('../../assets/images/profile-photo.png')} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     <Text style={{ ...Fonts.blackColor24Medium}}>Good Morning,</Text>
-                    <Text style={{marginTop: -5, ...Fonts.blackColor24Bold}}>Sarah!</Text>
+                    <Text style={{marginTop: -5, ...Fonts.blackColor24Bold}}>{userInfo.userCredential._tokenResponse.displayName}!</Text>
                 </View>
                 <View style={styles.boltContainer}>
                     <MaterialIcons

@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "Qibo",
-    "slug": "Qibo",
-    "version": "1.1.0",
+    "name": "qibo-app",
+    "slug": "qibo-app",
+    "version": "1.0.0",
+    "originalFullName": "@esophk/qibo-app",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -26,15 +27,21 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "googleServicesFile": "./firebase/google-services/android.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "c8e4a808-46c4-47df-864c-9aebcbbcc316"
+        "projectId": "7b401cee-3442-435b-8ca6-7e45103d6550"
       }
-    }
+    },
+    "owner": "esophk",
+    "scheme": "qibo-app",
+    "plugins": [
+      "@react-native-google-signin/google-signin"
+    ]
   }
 }
