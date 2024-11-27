@@ -10,6 +10,7 @@ import ProfileScreen from "../screens/profile/profile";
 import LessonScreen from "../screens/explore/lessonScreen";
 import Feather from '@expo/vector-icons/Feather';
 import { useFocusEffect } from "@react-navigation/native";
+import ChatScreen from "../screens/chatscreen/chatScreen";
 
 const { width } = Dimensions.get('window');
 
@@ -87,7 +88,7 @@ const BottomTabBarScreen = ({ route, navigation }) => {
                     </>
                     :
                     currentIndex == 2 ?
-                        <ProfileScreen navigation={navigation} />
+                        <ChatScreen navigation={navigation} />
                         :
                         currentIndex == 3 ?
                             <ProfileScreen navigation={navigation} />

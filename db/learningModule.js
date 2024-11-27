@@ -5,10 +5,9 @@ import {
   where,
   getDocs
 } from "firebase/firestore";
-import app from "../firebase/config";
+import { FIREBASE_DB } from "../firebase/config";
 
-const db = getFirestore(app);
-const Lecture = collection(db, "Lecture");
+const Lecture = collection(FIREBASE_DB, "Lecture");
 
 const fetchLearningModules = async () => {
   try {
@@ -17,7 +16,7 @@ const fetchLearningModules = async () => {
 
     for (const doc of querySnapshot.docs) {
       // Fetch subcollection 'lessons' for each Lecture document
-      const lessonsRef = collection(db, `Lecture/${doc.id}/lessons`);
+      const lessonsRef = collection(FIREBASE_DB, `Lecture/${doc.id}/lessons`);
       const lessonsSnapshot = await getDocs(lessonsRef);
 
       const lessons = [];

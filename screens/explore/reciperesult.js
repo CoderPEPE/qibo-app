@@ -72,7 +72,7 @@ const RecipeResult = ({ navigation }) => {
             <View style={styles.headerWrapStyle}>
                 <Entypo name="chevron-thin-left" size={22} style={{marginLeft: -5, marginRight: 20}} color="black" onPress={() => {currentScreen != 0 ? updateState({currentScreen : 0}) : navigation.push('BottomTabBar', {pageView : 'main'})}}/>
                 <View style={styles.profileContainer}>
-                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     <Text style={{marginTop: -15, ...Fonts.blackColor24ExtraBold}}>Recipes</Text>

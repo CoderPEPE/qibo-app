@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, Dimensions, ActivityIndicator, ImageBackground, ScrollView, StatusBar, Image, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from "react-native";
-import * as Progress from 'react-native-progress';
 import { Colors, Fonts, Sizes, } from "../../constants/styles";
 import { MaterialIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -182,7 +181,7 @@ const LessonScreen = ({ navigation }) => {
              >
                 <Entypo name="chevron-thin-left" size={22} style={{marginLeft: -5, marginRight: 20}} color="white" onPress={() => {currentScreen != 0 ? updateState({currentScreen : 0}) : navigation.push('BottomTabBar', {pageView : 'main'})}}/>
                 <View style={styles.profileContainer}>
-                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     {currentScreen == 0 &&
