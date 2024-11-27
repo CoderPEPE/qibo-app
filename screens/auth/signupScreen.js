@@ -23,6 +23,7 @@ import GoogleSignInButton from "../../components/googleSignInButton";
 import { useAtom } from "jotai";
 import userInfoAtom from "../../store/userInfo";
 import { Alert } from "react-native";
+import { addUser } from "../../db/users";
 
 const SignupScreen = ({ navigation }) => {
   const [state, setState] = useState({
@@ -75,6 +76,8 @@ const SignupScreen = ({ navigation }) => {
         emailAddress,
         password
       );
+
+      // await addUser(userCredential.user.uid, emailAddress, "email");
 
       await sendEmailVerification(userCredential.user)
         .then(() => console.log("Verification email sent successfully"))
@@ -301,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: Sizes.fixPadding * 2.2
+    marginTop: Sizes.fixPadding * 2.5
   },
 
   mainView: {

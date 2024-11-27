@@ -1,8 +1,6 @@
 import { useState, React, useEffect } from "react";
-import { TouchableOpacity, Image, StyleSheet, Text } from "react-native";
-import {
-  GoogleSignin,
-} from "@react-native-google-signin/google-signin";
+import { TouchableOpacity, Image, StyleSheet, Text, View } from "react-native";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { FIREBASE_AUTH } from "../firebase/config";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { Sizes } from "../constants/styles";
@@ -32,7 +30,10 @@ const GoogleSignInButton = ({ style, onSignInSuccess, onSignInError }) => {
       const credential = GoogleAuthProvider.credential(
         signInResult.data.idToken
       );
-      const userCredential = await signInWithCredential(FIREBASE_AUTH, credential);
+      const userCredential = await signInWithCredential(
+        FIREBASE_AUTH,
+        credential
+      );
       console.log("Sign In With Google Success", userCredential.user);
       setUserInfo({ auth: true, userCredential });
       onSignInSuccess(userCredential);
@@ -43,32 +44,22 @@ const GoogleSignInButton = ({ style, onSignInSuccess, onSignInError }) => {
   };
 
   return (
-    <TouchableOpacity style={style} onPress={signInWithGoogle}>
+    <View style={style} >
+      <TouchableOpacity onPress={signInWithGoogle}>
       <Image
         source={require("../assets/images/google-sign.png")}
         resizeMode="stretch"
         style={{
           backgroundColor: "white",
           borderRadius: 22,
-          marginTop: Sizes.fixPadding * 3.2,
+          marginTop: Sizes.fixPadding * 2.5,
           height: Sizes.fixPadding * 4.3,
           width: Sizes.fixPadding * 18.7
         }}
       />
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  icon: {
-    height: 24,
-    width: 24,
-    marginRight: 10
-  },
-  buttonText: {
-    fontSize: 16,
-    color: "#000"
-  }
-});
 
 export default GoogleSignInButton;

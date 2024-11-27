@@ -32,7 +32,7 @@ const ExploreScreen = ({ navigation }) => {
       <StatusBar backgroundColor={Colors.primaryColor} />
       <View style={{ flex: 1 }}>
         {bottomImage()}
-
+        
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 15.0 }}
