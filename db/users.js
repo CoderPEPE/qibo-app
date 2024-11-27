@@ -11,7 +11,7 @@ export const addUser = async (userId, email, authProvider) => {
     subscription: {
       plan: "",
       status: "",
-      renewalDate: serverTimestamp()
+      renewalDate: null,
     },
     bodyConstitution: {
       result: null,

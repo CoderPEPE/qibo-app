@@ -12,15 +12,11 @@ import {
   Alert
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { FIREBASE_AUTH, provider } from "../../firebase/config";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FIREBASE_AUTH } from "../../firebase/config";
 import {
   signInWithEmailAndPassword,
-  signInWithCredential,
-  GoogleAuthProvider
 } from "firebase/auth";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import GoogleSignInButton from "../../components/googleSignInButton";
 import { useAtom } from "jotai";
 import userInfoAtom from "../../store/userInfo";
@@ -75,6 +71,7 @@ const SigninScreen = ({ navigation }) => {
     });
     signInWithEmailAndPassword(FIREBASE_AUTH, emailAddress, password)
       .then(userCredential => {
+        console.log("User ID: ", userCredential.user.uid);
         const updatedUserCredential = userCredential;
         updatedUserCredential.user.displayName = updatedUserCredential.user.email.split("@")[0].charAt(0).toUpperCase() + updatedUserCredential.user.email.split("@")[0].slice(1);
         updatedUserCredential.user.photoURL = "https://www.asirox.com/wp-content/uploads/2022/07/depositphotos_90647730-stock-illustration-female-doctor-avatar-icon.webp";
@@ -306,7 +303,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
-    marginTop: Sizes.fixPadding * 2.2
+    marginTop: Sizes.fixPadding * 2.5
   },
 
   mainView: {
