@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, Dimensions, ImageBackground, ScrollView, StatusBar, Image, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from 'react-native-progress';
@@ -8,20 +8,40 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { Feather } from '@expo/vector-icons';
 import { useAtom } from "jotai";
 import userInfoAtom from "../../store/userInfo";
+import bodyConstitutionResult from "../../store/bodyConstitutionResult";
+import bodyConstitutionTestCompleted from "../../store/bodyConstitutionTestCompleted";
 
 const { width } = Dimensions.get('window');
 
 const questionList = ['Where you energetic?', 'Did you get tired easily?', 'Question3', 'Question4', 'Question5', 'Question6', 'Question7', 'Question8', 'Question9', 'Question10'];
 const answerList = ['None', 'Rarely', 'Sometimes', 'Often', 'Always']
 
-const QuestionScreen = ({ navigation }) => {
+const QuestionScreen = ({ navigation, route }) => {
 
-    const [userInfo, setUserInfo] = useAtom(userInfoAtom)
+    const [bodyConstitution, setBodyConstitution] = useAtom(bodyConstitutionResult);
+
+    const [userInfo, setUserInfo] = useAtom(userInfoAtom);
+
+    const [bodyConstitutionCompleted, setBodyConstitutionCompleted] = useAtom(bodyConstitutionTestCompleted);
+
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+    useEffect(() => {
+        if (route?.params?.reset) {
+          setCurrentQuestionIndex(0);
+          updateState({
+            questionCnt: 0,
+            selectedAnswer: 0,
+            responses: {},
+        }); // Reset to the first question
+        }
+      }, [route.params]);
 
     const [state, setState] = useState({
         pageTitle: questionList[0],
         selectedAnswer : 0,
         questionCnt: 0,
+        responses: {}
     });
 
     const updateState = (data) => setState((state) => ({ ...state, ...data}));
@@ -30,7 +50,80 @@ const QuestionScreen = ({ navigation }) => {
         pageTitle,
         selectedAnswer,
         questionCnt,
+        responses
     } = state;
+
+    const calculateScores = (responses) => {
+        const reverseItems = [2, 7, 8, 9, 22, 54];
+        const reversed_scores = reverseItems.reduce((acc, item) => {
+          acc[item] = 6 - (responses[item] || 0);
+          return acc;
+        }, {});
+
+        const calculateConvertedScore = (originalScore, itemCount) => {
+            return ((originalScore - itemCount) / (itemCount * 4)) * 100;
+        };
+        const balancedScores = [
+            responses[1],
+            reversed_scores[2],
+            reversed_scores[7],
+            reversed_scores[8],
+            reversed_scores[9],
+            reversed_scores[22],
+            responses[53],
+            reversed_scores[54],
+        ];
+        const balancedOriginal = balancedScores.reduce(
+            (acc, score) => acc + (score || 0),
+            0
+          );
+        const balancedConverted = calculateConvertedScore(balancedOriginal, 8);
+
+        const yangDeficientScores = [
+            responses[18],
+            responses[19],
+            responses[20],
+            responses[22],
+            responses[23],
+            responses[52],
+            responses[55],
+        ];
+        const yangDeficientOriginal = yangDeficientScores.reduce(
+            (acc, score) => acc + (score || 0),
+            0
+          );
+          const yangDeficientConverted = calculateConvertedScore(
+            yangDeficientOriginal,
+            7
+          );
+      
+          return {
+            balancedConverted,
+            yangDeficientConverted,
+          };
+    };
+
+    const handleNext = () => {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+            // Store the selected answer for the current question
+            const updatedResponses = { ...responses, [questionCnt]: selectedAnswer };
+        
+            // Check if all questions are answered
+            if (questionCnt + 1 === questionList.length) {
+              const scores = calculateScores(updatedResponses);
+              setBodyConstitution(scores);
+              setBodyConstitutionCompleted(true);
+              console.log("Scores: ", scores);
+              // Navigate to result screen or display the scores
+              navigation.navigate("ResultsScreen", { scores });
+            } else {
+              updateState({
+                questionCnt: questionCnt + 1,
+                selectedAnswer: 0,
+                responses: updatedResponses,
+              });
+            }
+    };
 
 
     return (
@@ -62,12 +155,12 @@ const QuestionScreen = ({ navigation }) => {
                 style={styles.headerWrapStyle}
              >
                 <View style={styles.profileContainer}>
-                    <Image src={userInfo.userCredential._tokenResponse.photoUrl} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto}/>
                 </View>
                 <View style={styles.helloContainer}>
                     <View style={{marginTop: Sizes.fixPadding * 2.0, flexDirection: 'row'}}>
                         <Text style={{...Fonts.darkRedColor24Regular}}>Hi, </Text>
-                        <Text style={{...Fonts.darkRedColor24Bold}}>{userInfo.userCredential._tokenResponse.displayName}!</Text>
+                        <Text style={{...Fonts.darkRedColor24Bold}}>{userInfo.userCredential.user.displayName}!</Text>
                     </View>
                     <Text style={{...Fonts.darkRedColor15Light}}>Answer the questions to complete</Text>
                     <View style={{flexDirection: 'row'}}>
@@ -85,7 +178,7 @@ const QuestionScreen = ({ navigation }) => {
             <Text style={styles.questionTitle}>{questionList[questionCnt]}</Text>
             <FlatList
                 data={answerList}
-                keyExtractor={(item, index) => index}                    
+                keyExtractor={(item, index) => index.toString()}                    
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item, index }) => (                        
                     <TouchableOpacity
@@ -129,7 +222,7 @@ const QuestionScreen = ({ navigation }) => {
             </View>
             <View style={styles.btnContainer}>
                 <TouchableOpacity
-                    disabled={questionCnt == 0 ? true : false}
+                    disabled={questionCnt == 0}
                     onPress={() => updateState({questionCnt : questionCnt - 1, selectedAnswer : 0})}
                     style={styles.bottomBtn}
                 >
@@ -138,7 +231,7 @@ const QuestionScreen = ({ navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     disabled={selectedAnswer == 0 ? true : false}
-                    onPress={() => updateState({questionCnt : questionCnt + 1, selectedAnswer : 0})}
+                    onPress={handleNext}
                     style={styles.bottomBtn}
                 >
                     <Text style={selectedAnswer == 0 ? {...Fonts.disabledButton} : {...Fonts.darkRedColor20Bold}}>Next</Text>

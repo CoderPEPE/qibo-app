@@ -3,6 +3,8 @@ import { getAnalytics, isSupported } from "firebase/analytics";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { firebase } from "@react-native-firebase/auth";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDc2ZlXnFSufncm4p-6cw3aBUprNMleXgI",
@@ -14,11 +16,9 @@ const firebaseConfig = {
   measurementId: "G-ZS4SVY0RR6"
 };
 
-const app = initializeApp(firebaseConfig);
+const FIREBASE_APP = initializeApp(firebaseConfig);
 
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
+const FIREBASE_AUTH = getAuth(FIREBASE_APP);
 
 let analytics = null;
 isSupported().then(supported => {
@@ -29,4 +29,6 @@ isSupported().then(supported => {
   }
 });
 
-export { app, auth, analytics };
+const FIREBASE_DB = getFirestore(FIREBASE_APP);
+
+export { FIREBASE_APP, FIREBASE_AUTH, analytics, FIREBASE_DB };

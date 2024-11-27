@@ -2,9 +2,8 @@ import { useState, React, useEffect } from "react";
 import { TouchableOpacity, Image, StyleSheet, Text } from "react-native";
 import {
   GoogleSignin,
-  GoogleSigninButton
 } from "@react-native-google-signin/google-signin";
-import { auth } from "../firebase/config";
+import { FIREBASE_AUTH } from "../firebase/config";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { Sizes } from "../constants/styles";
 import { useAtom } from "jotai";
@@ -33,7 +32,7 @@ const GoogleSignInButton = ({ style, onSignInSuccess, onSignInError }) => {
       const credential = GoogleAuthProvider.credential(
         signInResult.data.idToken
       );
-      const userCredential = await signInWithCredential(auth, credential);
+      const userCredential = await signInWithCredential(FIREBASE_AUTH, credential);
       console.log("Sign In With Google Success", userCredential.user);
       setUserInfo({ auth: true, userCredential });
       onSignInSuccess(userCredential);

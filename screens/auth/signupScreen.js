@@ -13,10 +13,11 @@ import {
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { auth } from "../../firebase/config";
+import { FIREBASE_AUTH } from "../../firebase/config";
 import {
   onAuthStateChanged,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  sendEmailVerification
 } from "firebase/auth";
 import GoogleSignInButton from "../../components/googleSignInButton";
 import { useAtom } from "jotai";
@@ -35,7 +36,6 @@ const SignupScreen = ({ navigation }) => {
   });
 
   const updateState = data => setState(state => ({ ...state, ...data }));
-  const [userInfo, setUserInfo] = useAtom(userInfoAtom);
 
   const {
     showPassword,
@@ -47,26 +47,70 @@ const SignupScreen = ({ navigation }) => {
     confirmation
   } = state;
 
-  const signUp = () => {
-    createUserWithEmailAndPassword(auth, emailAddress, password)
-      .then(userCredential => {
-        setUserInfo({ auth: true, userCredential });
-        console.log("Sign Up Success", userCredential);
+  const signUp = async () => {
+    try {
+      if (password !== confirmation) {
+        Alert.alert(
+          "Password Mismatch",
+          "Password and confirmation password do not match. Please try again."
+        );
+        return;
+      }
 
-        Alert.alert('Registered successfully');
-      })
-      .catch(error => {
-        setUserInfo({ auth: false, userCredential: {} });
-        console.log("Sign Up Error", error);
-      });
+      if (!password || password.length < 6) {
+        Alert.alert(
+          "Weak Password",
+          "Password should be at least 6 characters long."
+        );
+        return;
+      }
+
+      if (!emailAddress) {
+        Alert.alert("Email Required", "Please enter your email address.");
+        return;
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(
+        FIREBASE_AUTH,
+        emailAddress,
+        password
+      );
+
+      await sendEmailVerification(userCredential.user)
+        .then(() => console.log("Verification email sent successfully"))
+        .catch(error =>
+          console.error("Error sending verification email:", error)
+        );
+
+      console.log("USERCREDENTIAL.user", userCredential);
+
+      Alert.alert(
+        "Verification Email Sent",
+        "Please check your email to verify your account before logging in.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.push("Signin")
+          }
+        ]
+      );
+    } catch (error) {
+      console.log("Sign Up Error", error);
+      Alert.alert("Error", error.message);
+    }
   };
 
-  useEffect(
-    () => {
-      if (userInfo.auth) navigation.push("BottomTabBar", { pageView: "main" });
-    },
-    [userInfo]
-  );
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, user => {
+      if (user) {
+        if (emailAddress && user.emailVerified) {
+          navigation.push("Signin");
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
@@ -194,7 +238,7 @@ const SignupScreen = ({ navigation }) => {
       <GoogleSignInButton
         style={styles.socialMediaIconsWrapStyle}
         onSignInError={() => {}}
-        onSignInSuccess={userCredential => {}}
+        onSignInSuccess={userCredential => {navigation.push("Signin")}}
       />
     );
   }

@@ -8,12 +8,13 @@ import {
   Text,
   ScrollView,
   Image,
-  StyleSheet
+  StyleSheet,
+  Alert
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { auth, provider } from "../../firebase/config";
+import { FIREBASE_AUTH, provider } from "../../firebase/config";
 import {
   signInWithEmailAndPassword,
   signInWithCredential,
@@ -72,14 +73,23 @@ const SigninScreen = ({ navigation }) => {
       emailErrorMessage: "",
       passwordErrorMessage: ""
     });
-    signInWithEmailAndPassword(auth, emailAddress, password)
+    signInWithEmailAndPassword(FIREBASE_AUTH, emailAddress, password)
       .then(userCredential => {
-        setUserInfo({ auth: true, userCredential });
-        console.log("Sign In Success", userCredential);
+        const updatedUserCredential = userCredential;
+        updatedUserCredential.user.displayName = updatedUserCredential.user.email.split("@")[0].charAt(0).toUpperCase() + updatedUserCredential.user.email.split("@")[0].slice(1);
+        updatedUserCredential.user.photoURL = "https://www.asirox.com/wp-content/uploads/2022/07/depositphotos_90647730-stock-illustration-female-doctor-avatar-icon.webp";
+        setUserInfo({ auth: true, userCredential: updatedUserCredential });
+        console.log("Sign In Success", updatedUserCredential);
       })
       .catch(error => {
         setUserInfo({ auth: false, userCredential: {} });
         console.log("Sign In Error", error);
+        if (error.code === "auth/invalid-credential") {
+          Alert.alert("Error", "This email is not registered.");
+        }
+        if (error.code === "auth/missing-email") {
+          Alert.alert("Warning", "Please insert email and password")
+        }
         setState({
           ...state,
           emailError:
@@ -215,7 +225,13 @@ const SigninScreen = ({ navigation }) => {
       <GoogleSignInButton
         style={styles.socialMediaIconsWrapStyle}
         onSignInError={() => {}}
-        onSignInSuccess={userCredential => {}}
+        onSignInSuccess={async userCredential => {
+          try {
+            setUserInfo({ auth: true, userCredential });
+          } catch (error) {
+            console.error("Error in sign in process:", error);
+          }
+        }}
       />
     );
   }
@@ -275,7 +291,7 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 12,
     marginTop: 5,
-    marginLeft: Sizes.fixPadding * 2.0,
+    marginLeft: Sizes.fixPadding * 2.0
   },
 
   socialMediaIconsStyle: {
