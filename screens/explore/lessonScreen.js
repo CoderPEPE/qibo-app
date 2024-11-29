@@ -46,20 +46,20 @@ const LessonScreen = ({ navigation }) => {
             const today = new Date().toISOString().split('T')[0];
             const lastUnlockDate = await AsyncStorage.getItem('lastUnlockDate');
             const completedLessons = JSON.parse(await AsyncStorage.getItem('completedLessons')) || {};
-            
+
             // Check if this is the first time running the app
             const isFirstTime = await AsyncStorage.getItem('isFirstTimeLoad');
-            
+
             if (!isFirstTime) {
                 // First time initialization
                 await AsyncStorage.setItem('isFirstTimeLoad', 'false');
                 await AsyncStorage.setItem('lastUnlockDate', today);
                 await AsyncStorage.setItem('lastUnlockedLesson', JSON.stringify({ moduleId: 1, lessonId: 1 }));
-                
+
                 // Only unlock the first lesson of the first module
                 modules[0].lessons[0].unlocked = true;
                 modules[0].unlocked = true;
-                
+
                 // Lock all other modules and lessons
                 for (let i = 0; i < modules.length; i++) {
                     if (i === 0) {
@@ -75,29 +75,29 @@ const LessonScreen = ({ navigation }) => {
                         });
                     }
                 }
-                
+
                 return modules;
             }
-    
+
             // Normal daily check logic
             const lastUnlockedLesson = JSON.parse(await AsyncStorage.getItem('lastUnlockedLesson')) || { moduleId: 1, lessonId: 1 };
-    
+
             if (lastUnlockDate !== today) {
                 await AsyncStorage.setItem('lastUnlockDate', today);
-                
+
                 let newLessonUnlocked = false;
                 for (let module of modules) {
                     for (let lesson of module.lessons) {
-                        if (!newLessonUnlocked && 
-                            (module.moduleId < lastUnlockedLesson.moduleId || 
-                            (module.moduleId === lastUnlockedLesson.moduleId && lesson.lessonsId <= lastUnlockedLesson.lessonId) ||
-                            completedLessons[`${module.moduleId}-${lesson.lessonsId}`])) {
+                        if (!newLessonUnlocked &&
+                            (module.moduleId < lastUnlockedLesson.moduleId ||
+                                (module.moduleId === lastUnlockedLesson.moduleId && lesson.lessonsId <= lastUnlockedLesson.lessonId) ||
+                                completedLessons[`${module.moduleId}-${lesson.lessonsId}`])) {
                             lesson.unlocked = true;
-                        } else if (!newLessonUnlocked && 
+                        } else if (!newLessonUnlocked &&
                             (module.moduleId === lastUnlockedLesson.moduleId && lesson.lessonsId === lastUnlockedLesson.lessonId + 1)) {
                             lesson.unlocked = true;
                             newLessonUnlocked = true;
-                            await AsyncStorage.setItem('lastUnlockedLesson', 
+                            await AsyncStorage.setItem('lastUnlockedLesson',
                                 JSON.stringify({ moduleId: module.moduleId, lessonId: lesson.lessonsId }));
                         } else {
                             lesson.unlocked = false;
@@ -109,13 +109,13 @@ const LessonScreen = ({ navigation }) => {
                 // Same day - maintain current unlock status
                 for (let module of modules) {
                     for (let lesson of module.lessons) {
-                        lesson.unlocked = completedLessons[`${module.moduleId}-${lesson.lessonsId}`] || 
+                        lesson.unlocked = completedLessons[`${module.moduleId}-${lesson.lessonsId}`] ||
                             (module.moduleId === lastUnlockedLesson.moduleId && lesson.lessonsId <= lastUnlockedLesson.lessonId);
                     }
                     module.unlocked = module.lessons.some(lesson => lesson.unlocked);
                 }
             }
-    
+
             return modules;
         } catch (error) {
             console.error("Error in checkUnlockStatus:", error);
@@ -137,9 +137,9 @@ const LessonScreen = ({ navigation }) => {
         }
     };
 
-    const updateState = (data) => setState((state) => ({ ...state, ...data}));
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const{
+    const {
         currentScreen,
         pageTitle,
         moduleId,
@@ -149,7 +149,7 @@ const LessonScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
-            <View style={{ flex: 1 }}>            
+            <View style={{ flex: 1 }}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 15.0 }}
@@ -178,126 +178,130 @@ const LessonScreen = ({ navigation }) => {
                 source={require('../../assets/images/topbar-back.png')}
                 style={styles.headerWrapStyle}
                 resizeMode="stretch"
-             >
-                <Entypo name="chevron-thin-left" size={22} style={{marginLeft: -5, marginRight: 20}} color="white" onPress={() => {currentScreen != 0 ? updateState({currentScreen : 0}) : navigation.push('BottomTabBar', {pageView : 'main'})}}/>
+            >
+                <Entypo name="chevron-thin-left" size={22} style={{ marginLeft: -5, marginRight: 20 }} color="white" onPress={() => { currentScreen != 0 ? updateState({ currentScreen: 0 }) : navigation.push('BottomTabBar', { pageView: 'main' }) }} />
                 <View style={styles.profileContainer}>
-                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto} />
                 </View>
                 <View style={styles.helloContainer}>
                     {currentScreen == 0 &&
-                        <Text style={{marginTop: Sizes.fixPadding * -1.5, ...Fonts.WhiteColor24ExtraBold}}>{pageTitle}</Text>
+                        <Text style={{ marginTop: Sizes.fixPadding * -1.5, ...Fonts.WhiteColor24ExtraBold }}>{pageTitle}</Text>
                     }
                     {currentScreen == 1 &&
                         <>
-                            <Text style={{marginTop: Sizes.fixPadding * -1.9, ...Fonts.whiteColor17Medium}}>MODULE {moduleId}</Text>
-                            <Text style={{...Fonts.WhiteColor20ExtraBold}}>{learningModules[moduleId - 1].title}</Text>
+                            <Text style={{ marginTop: Sizes.fixPadding * -1.9, ...Fonts.whiteColor17Medium }}>MODULE {moduleId}</Text>
+                            <Text style={{ ...Fonts.WhiteColor20ExtraBold }}>{learningModules[moduleId - 1].title}</Text>
                         </>
                     }
                     {currentScreen == 2 &&
                         <>
-                            <Text style={{marginTop: Sizes.fixPadding * -1.9, ...Fonts.whiteColor17Medium}}>LESSONS {lessonId}</Text>
-                            <Text style={{...Fonts.WhiteColor20ExtraBold}}>{learningModules[moduleId - 1]?.lessons[lessonId - 1].title}</Text>
+                            <Text style={{ marginTop: Sizes.fixPadding * -1.9, ...Fonts.whiteColor17Medium }}>LESSONS {lessonId}</Text>
+                            <Text style={{ ...Fonts.WhiteColor20ExtraBold }}>{learningModules[moduleId - 1]?.lessons[lessonId - 1].title}</Text>
                         </>
                     }
                 </View>
                 <View style={styles.boltContainer}>
-                    <MaterialIcons
-                        name='bolt'
-                        size={35}
-                        color={Colors.whiteColor}
-                    />
-                    <Text style={styles.notifyNumber}>11</Text>
+                    <TouchableOpacity
+                        style={styles.boltButton}
+                        onPress={() => navigation.push("CheckInScreen")}
+                    >
+                        <Text style={styles.boltText}>
+                            Daily Check-in{"\n"}
+                            For Rewards
+                        </Text>
+                        <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
+                    </TouchableOpacity>
                 </View>
             </ImageBackground>
         )
     }
 
     function listView() {
-        return(
-        <View>
+        return (
             <View>
-            {currentScreen == 0 &&
-               <FlatList
-                    data={learningModules}
-                    keyExtractor={(item) => item.id}                    
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={[styles.lessonItem, !item.unlocked && styles.lockedItem]}
-                            activeOpacity={0.9}
-                            onPress={() => {
-                                if (item.unlocked) {
-                                    updateState({currentScreen: 1, moduleId: parseInt(item.moduleId)});
-                                } else {
-                                    Alert.alert("Module Locked", "This module is not yet available. Complete previous lessons to unlock it.");
-                                }
-                            }}
-                        >
-                            {item.done ?
-                                <View style={styles.moduleId}>
-                                    <Feather name="check" size={24} color="white" />
-                                </View>
-                                :
-                                <View style={styles.moduleIdPink}>
-                                {!item.unlocked && <Feather name="lock" size={24} color="white" />}
-                                </View>
-                            }
-                            <View style={styles.foodContainer}>
-                                <Text style={{...Fonts.blackColor17Medium}}>MODULE {item.moduleId}</Text>
-                                <Text style={{...Fonts.blackColor20ExtraBold}}>{item.title}</Text>
-                            </View>
-                            <Entypo name="chevron-thin-right" size={25} color="black" style={styles.rightSelector}/>
-                        </TouchableOpacity>
-                    )}
-                />
-            }
-            {currentScreen == 1 &&
-               <FlatList
-                    data={learningModules[moduleId-1].lessons}
-                    keyExtractor={(item) => item.id}                    
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={[styles.lessonItem, !item.unlocked && styles.lockedItem]}
-                            activeOpacity={0.9}
-                            onPress={() => {
-                                if (item.unlocked) {
-                                    updateState({currentScreen: 2, lessonId: parseInt(item.lessonsId)});
-                                } else {
-                                    Alert.alert("Lesson Locked", "This lesson is not yet available. Complete previous lessons or wait for it to unlock.");
-                                }
-                            }}
-                        >
-                            {item.done ?
-                                <View style={styles.moduleId}>
-                                    <Feather name="check" size={24} color="white" />
-                                </View>
-                                :
-                                <View style={styles.moduleIdPink}>
-                                    {!item.unlocked && <Feather name="lock" size={24} color="white" />}
-                                </View>
-                            }
-                            <View style={styles.foodContainer}>
-                                <Text style={{...Fonts.blackColor17Medium}}>LESSON {item.lessonsId}</Text>
-                                <Text style={{...Fonts.blackColor20ExtraBold}}>{item.title}</Text>
-                            </View>
-                            <Entypo name="chevron-thin-right" size={25} color="black" style={styles.rightSelector}/>
-                        </TouchableOpacity>
-                    )}
-                />
-            }
-            {currentScreen == 2 &&
-               <View style={styles.lessonContainer}>
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ paddingVertical: Sizes.fixPadding * 2.5, paddingHorizontal: Sizes.fixPadding * 4.0}}
-                    >
-                        <Text>{learningModules[moduleId-1].lessons[lessonId - 1].description}</Text>
-                    </ScrollView>
-               </View>
-            }
-            </View>
-        </View>)
+                <View>
+                    {currentScreen == 0 &&
+                        <FlatList
+                            data={learningModules}
+                            keyExtractor={(item) => item.id}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={[styles.lessonItem, !item.unlocked && styles.lockedItem]}
+                                    activeOpacity={0.9}
+                                    onPress={() => {
+                                        if (item.unlocked) {
+                                            updateState({ currentScreen: 1, moduleId: parseInt(item.moduleId) });
+                                        } else {
+                                            Alert.alert("Module Locked", "This module is not yet available. Complete previous lessons to unlock it.");
+                                        }
+                                    }}
+                                >
+                                    {item.done ?
+                                        <View style={styles.moduleId}>
+                                            <Feather name="check" size={24} color="white" />
+                                        </View>
+                                        :
+                                        <View style={styles.moduleIdPink}>
+                                            {!item.unlocked && <Feather name="lock" size={24} color="white" />}
+                                        </View>
+                                    }
+                                    <View style={styles.foodContainer}>
+                                        <Text style={{ ...Fonts.blackColor17Medium }}>MODULE {item.moduleId}</Text>
+                                        <Text style={{ ...Fonts.blackColor20ExtraBold }}>{item.title}</Text>
+                                    </View>
+                                    <Entypo name="chevron-thin-right" size={25} color="black" style={styles.rightSelector} />
+                                </TouchableOpacity>
+                            )}
+                        />
+                    }
+                    {currentScreen == 1 &&
+                        <FlatList
+                            data={learningModules[moduleId - 1].lessons}
+                            keyExtractor={(item) => item.id}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={[styles.lessonItem, !item.unlocked && styles.lockedItem]}
+                                    activeOpacity={0.9}
+                                    onPress={() => {
+                                        if (item.unlocked) {
+                                            updateState({ currentScreen: 2, lessonId: parseInt(item.lessonsId) });
+                                        } else {
+                                            Alert.alert("Lesson Locked", "This lesson is not yet available. Complete previous lessons or wait for it to unlock.");
+                                        }
+                                    }}
+                                >
+                                    {item.done ?
+                                        <View style={styles.moduleId}>
+                                            <Feather name="check" size={24} color="white" />
+                                        </View>
+                                        :
+                                        <View style={styles.moduleIdPink}>
+                                            {!item.unlocked && <Feather name="lock" size={24} color="white" />}
+                                        </View>
+                                    }
+                                    <View style={styles.foodContainer}>
+                                        <Text style={{ ...Fonts.blackColor17Medium }}>LESSON {item.lessonsId}</Text>
+                                        <Text style={{ ...Fonts.blackColor20ExtraBold }}>{item.title}</Text>
+                                    </View>
+                                    <Entypo name="chevron-thin-right" size={25} color="black" style={styles.rightSelector} />
+                                </TouchableOpacity>
+                            )}
+                        />
+                    }
+                    {currentScreen == 2 &&
+                        <View style={styles.lessonContainer}>
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
+                                contentContainerStyle={{ paddingVertical: Sizes.fixPadding * 2.5, paddingHorizontal: Sizes.fixPadding * 4.0 }}
+                            >
+                                <Text>{learningModules[moduleId - 1].lessons[lessonId - 1].description}</Text>
+                            </ScrollView>
+                        </View>
+                    }
+                </View>
+            </View>)
     }
 
 
@@ -306,11 +310,11 @@ const LessonScreen = ({ navigation }) => {
             <View style={styles.bottomButtonContainer}>
                 <TouchableOpacity
                     disabled={lessonId - 1 === 0}
-                    onPress={() => updateState({lessonId: Number(lessonId) - 1})}
+                    onPress={() => updateState({ lessonId: Number(lessonId) - 1 })}
                     style={styles.bottomBtn}
                 >
-                    <Entypo name="chevron-left" size={25} color="white"/>
-                    <Text style={{...Fonts.whiteColor20Bold}}>Back</Text>
+                    <Entypo name="chevron-left" size={25} color="white" />
+                    <Text style={{ ...Fonts.whiteColor20Bold }}>Back</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={async () => {
@@ -318,28 +322,28 @@ const LessonScreen = ({ navigation }) => {
                         const currentModule = learningModules[moduleId - 1];
                         if (currentModule.lessons.length > lessonId) {
                             if (currentModule.lessons[lessonId].unlocked) {
-                                updateState({lessonId: Number(lessonId) + 1});
+                                updateState({ lessonId: Number(lessonId) + 1 });
                             } else {
                                 Alert.alert("Lesson Locked", "You've completed this lesson. The next lesson will be unlocked tomorrow.");
-                                updateState({currentScreen: 1}); // Go back to lesson list
+                                updateState({ currentScreen: 1 }); // Go back to lesson list
                             }
                         } else if (moduleId < learningModules.length) {
                             const nextModule = learningModules[moduleId];
                             if (nextModule.unlocked) {
-                                updateState({moduleId: moduleId + 1, lessonId: 1, currentScreen: 1});
+                                updateState({ moduleId: moduleId + 1, lessonId: 1, currentScreen: 1 });
                             } else {
                                 Alert.alert("Module Locked", "You've completed all lessons in this module. The next module will be unlocked when available.");
-                                updateState({currentScreen: 0}); // Go back to module list
+                                updateState({ currentScreen: 0 }); // Go back to module list
                             }
                         } else {
                             Alert.alert("Congratulations!", "You've completed all available lessons.");
-                            updateState({currentScreen: 0}); // Go back to module list
+                            updateState({ currentScreen: 0 }); // Go back to module list
                         }
                     }}
                     style={styles.bottomBtn}
                 >
-                    <Text style={{...Fonts.whiteColor20Bold}}>Next</Text>
-                    <Entypo name="chevron-right" size={25} color="white"/>
+                    <Text style={{ ...Fonts.whiteColor20Bold }}>Next</Text>
+                    <Entypo name="chevron-right" size={25} color="white" />
                 </TouchableOpacity>
             </View>
         );
@@ -354,7 +358,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     absolute: {
-        position: "absolute",   
+        position: "absolute",
         top: 0,
         left: 0,
         bottom: 0,
@@ -366,14 +370,14 @@ const styles = StyleSheet.create({
         paddingVertical: Sizes.fixPadding * 2.2,
         paddingHorizontal: Sizes.fixPadding * 2.0,
         paddingBottom: Sizes.fixPadding * 3.0,
-        marginBottom: Sizes.fixPadding *3.5,
+        marginBottom: Sizes.fixPadding * 3.5,
         overflow: "hidden",
         borderBottomRightRadius: Sizes.fixPadding * 3.2,
         borderBottomLeftRadius: Sizes.fixPadding * 3.2,
     },
     profilePhoto: {
         width: 43,
-        height: 43,       
+        height: 43,
     },
     profileContainer: {
         borderColor: Colors.pinkColor,
@@ -386,7 +390,7 @@ const styles = StyleSheet.create({
         marginLeft: Sizes.fixPadding * 1.5,
     },
     boltContainer: {
-        marginLeft: 'auto',        
+        marginLeft: 'auto',
         position: 'relative',
     },
     notifyNumber: {
@@ -398,9 +402,9 @@ const styles = StyleSheet.create({
     topContainer: {
 
     },
-    mealDetails:{
+    mealDetails: {
         flexDirection: 'row',
-        alignItems: 'center',        
+        alignItems: 'center',
     },
     mealItem: {
         marginHorizontal: Sizes.fixPadding * 0.8,
@@ -422,7 +426,7 @@ const styles = StyleSheet.create({
     lessonItem: {
         marginHorizontal: Sizes.fixPadding * 2,
         marginVertical: Sizes.fixPadding * 0.8,
-       
+
         height: 100.0,
         backgroundColor: Colors.whiteColor,
         flexDirection: 'row',
@@ -432,8 +436,8 @@ const styles = StyleSheet.create({
 
         shadowColor: '#0009',
         shadowOffset: {
-        width: 0,
-        height: 4,
+            width: 0,
+            height: 4,
         },
         shadowOpacity: 0.9,
         elevation: 5,
@@ -468,26 +472,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        
+
     },
     bottomButtonContainer: {
         width: '100%',
 
         position: 'absolute',
         bottom: Sizes.fixPadding * 11.8,
-        
+
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
     },
     bottomBtn: {
         backgroundColor: Colors.greenColor,
-
         width: Sizes.fixPadding * 11.0,
         height: Sizes.fixPadding * 3.8,
-
         borderRadius: Sizes.fixPadding * 2,
-
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
@@ -495,6 +496,16 @@ const styles = StyleSheet.create({
     },
     lockedItem: {
         opacity: 0.5,
+    },
+    boltButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    boltText: {
+        textAlign: "center",
+        marginBottom: 5,
+        ...Fonts.greenColor13SemiBold
     },
 })
 
