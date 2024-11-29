@@ -78,8 +78,16 @@ const ProfileScreen = ({ navigation }) => {
           </Text>
         </View>
         <View style={styles.boltContainer}>
-          <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
-          <Text style={styles.notifyNumber}>11</Text>
+          <TouchableOpacity
+            style={styles.boltButton}
+            onPress={() => navigation.push("CheckInScreen")}
+          >
+            <Text style={styles.boltText}>
+            Daily Check-in{"\n"}
+            For Rewards
+            </Text>
+            <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -303,6 +311,16 @@ const styles = StyleSheet.create({
     marginTop: 12,
     color: "#555",
     ...Fonts.blackColor15Bold
+  },
+  boltText: {
+    textAlign: "center",
+    marginBottom: 5,
+    ...Fonts.greenColor13SemiBold
+  },
+  boltButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
 

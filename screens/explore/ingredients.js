@@ -56,7 +56,7 @@ const IngredientScreen = ({ navigation }) => {
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
             <View style={{ flex: 1 }}>
-            {bottomImage()}
+                {bottomImage()}
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 15.0 }}
@@ -73,20 +73,23 @@ const IngredientScreen = ({ navigation }) => {
     function header() {
         return (
             <View style={styles.headerWrapStyle}>
-                <Entypo name="chevron-thin-left" size={22} style={{marginLeft: -5, marginRight: 20}} color="black" onPress={() => navigation.push('BottomTabBar', {pageView : 'main'})} />
+                <Entypo name="chevron-thin-left" size={22} style={{ marginLeft: -5, marginRight: 20 }} color="black" onPress={() => navigation.push('BottomTabBar', { pageView: 'main' })} />
                 <View style={styles.profileContainer}>
-                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto} />
                 </View>
                 <View style={styles.helloContainer}>
-                    <Text style={{marginTop: -15, ...Fonts.blackColor24ExtraBold}}>Ingredients</Text>
+                    <Text style={{ marginTop: -15, ...Fonts.blackColor24ExtraBold }}>Ingredients</Text>
                 </View>
                 <View style={styles.boltContainer}>
-                    <MaterialIcons
-                        name='bolt'
-                        size={35}
-                        color={Colors.blackColor}
-                    />
-                    <Text style={styles.notifyNumber}>11</Text>
+                    <TouchableOpacity
+                        style={styles.boltButton}
+                        onPress={() => navigation.push("CheckInScreen")}
+                    >
+                        <Text style={styles.boltText}>
+                            Daily Check-in{"\n"}
+                            For Rewards</Text>
+                        <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
+                    </TouchableOpacity>
                 </View>
             </View>
         )
@@ -108,8 +111,8 @@ const IngredientScreen = ({ navigation }) => {
                     justifyContent: 'flex-start',
                     shadowColor: '#105042',
                     shadowOffset: {
-                      width: -2,
-                      height: -5,
+                        width: -2,
+                        height: -5,
                     },
                     shadowOpacity: 0.4,
                     shadowRadius: 10,
@@ -118,28 +121,28 @@ const IngredientScreen = ({ navigation }) => {
                 }}
             >
                 {item.locked ?
-                <>
-                    <Image
-                        source={item.image}
-                        style={styles.tileImage}
-                        blurRadius={20} 
-                    />
-                </>
-                :
-                <>
-                    <Image
-                        source={item.image}
-                        style={styles.tileImage}
-                    />
-                    <Text style={styles.tileTitle}>
-                        {item.libraryFor}
-                    </Text>
-                </>
+                    <>
+                        <Image
+                            source={item.image}
+                            style={styles.tileImage}
+                            blurRadius={20}
+                        />
+                    </>
+                    :
+                    <>
+                        <Image
+                            source={item.image}
+                            style={styles.tileImage}
+                        />
+                        <Text style={styles.tileTitle}>
+                            {item.libraryFor}
+                        </Text>
+                    </>
                 }
                 {item.locked &&
-                <View style={styles.lockContainer}>
-                    <MaterialIcons name="lock-outline" size={50} color="white" style={styles.lockIcon}/>
-                </View>
+                    <View style={styles.lockContainer}>
+                        <MaterialIcons name="lock-outline" size={50} color="white" style={styles.lockIcon} />
+                    </View>
                 }
             </TouchableOpacity>
         )
@@ -156,7 +159,7 @@ const IngredientScreen = ({ navigation }) => {
     function bottomImage() {
         return (
             <View style={styles.container}>
-                <Image source={require('../../assets/images/Shape.png')} style={styles.backImage}/>
+                <Image source={require('../../assets/images/Shape.png')} style={styles.backImage} />
             </View>
         )
     }
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
     },
     profilePhoto: {
         width: 43,
-        height: 43,       
+        height: 43,
     },
     profileContainer: {
         borderColor: Colors.pinkColor,
@@ -202,7 +205,7 @@ const styles = StyleSheet.create({
         marginLeft: Sizes.fixPadding * 1.5,
     },
     boltContainer: {
-        marginLeft: 'auto',        
+        marginLeft: 'auto',
         position: 'relative',
     },
     notifyNumber: {
@@ -218,8 +221,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         shadowColor: '#0005',
         shadowOffset: {
-        width: 0,
-        height: 4,
+            width: 0,
+            height: 4,
         },
         shadowOpacity: 0.5,
         elevation: 5,
@@ -246,8 +249,17 @@ const styles = StyleSheet.create({
     },
     lockIcon: {
         position: 'absolute',
-
-    }
+    },
+    boltButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    boltText: {
+        textAlign: "center",
+        marginBottom: 5,
+        ...Fonts.greenColor13SemiBold
+    },
 })
 
 export default IngredientScreen;

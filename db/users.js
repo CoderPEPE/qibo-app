@@ -1,8 +1,18 @@
-import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+// Start of Selection
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+  updateDoc
+} from "firebase/firestore";
 import { FIREBASE_DB } from "../firebase/config";
 
 const userCollection = collection(FIREBASE_DB, "users");
-
 
 export const addUser = async (userId, email, authProvider) => {
   const dbData = {
@@ -11,7 +21,7 @@ export const addUser = async (userId, email, authProvider) => {
     subscription: {
       plan: "",
       status: "",
-      renewalDate: null,
+      renewalDate: null
     },
     bodyConstitution: {
       result: null,
@@ -26,75 +36,85 @@ export const addUser = async (userId, email, authProvider) => {
   return await setDoc(doc(userCollection, userId), dbData);
 };
 
-export const getUserData = async (userId) => {
+export const getUserData = async userId => {
   const userDocRef = doc(userCollection, userId);
   const userDoc = await getDoc(userDocRef);
   return userDoc.exists() ? userDoc.data() : null;
 };
 
 export const updateBodyConstitution = async (userId, result) => {
-    const userRef = doc(userCollection, userId);
-    return await updateDoc(userRef, {
-        bodyConstitution: {
-            result,
-            testDate: serverTimestamp()
-        }
-    });
-}
+  const userRef = doc(userCollection, userId);
+  return await updateDoc(userRef, {
+    bodyConstitution: {
+      result,
+      testDate: serverTimestamp()
+    }
+  });
+};
 
 export const updateSubscription = async (userId, plan, status) => {
-    const userRef = doc(userCollection, userId);
-    return await updateDoc(userRef, {
-        subscription: {
-            plan,
-            status,
-            renewalDate: serverTimestamp()
-        }
-    });
-}
-
-export const addUserCheckIn = async (userId, rewarded) => {
-    const checkInData = {
-        date: serverTimestamp(),
-        rewarded
+  const userRef = doc(userCollection, userId);
+  return await updateDoc(userRef, {
+    subscription: {
+      plan,
+      status,
+      renewalDate: serverTimestamp()
     }
-    const userDocRef = doc(userCollection, userId);
-    const checkInsCollection = collection(userDocRef, "checkIns");
-    return await addDoc(checkInsCollection, checkInData);
-}
+  });
+};
+
+export const addUserCheckIn = async userId => {
+  const checkInData = {
+    lastCheckIn: null,
+    consecutiveDays: 0,
+    unlockedIngredients: [],
+    unlockedRecipes: []
+  };
+  const userDocRef = doc(userCollection, userId);
+  const checkInsCollection = collection(userDocRef, "userCheckIns");
+  return await addDoc(checkInsCollection, checkInData);
+};
 
 export const updateConsecutiveCheckIns = async (userId, count) => {
-    const userRef = doc(userCollection, userId);
-    return await updateDoc(userRef, {
-        consecutiveCheckIns: count,
-        lastCheckInDate: serverTimestamp()
-    });
-}
+  const userRef = doc(userCollection, userId);
+  return await updateDoc(userRef, {
+    consecutiveCheckIns: count,
+    lastCheckInDate: null
+  });
+};
 
-export const getUserCheckIns = async (userId) => {
-    const userDocRef = doc(userCollection, userId);
-    const checkInsCollection = collection(userDocRef, "checkIns");
-    const checkInsSnapshot = await getDocs(checkInsCollection);
-    return checkInsSnapshot.docs.map((doc) => doc.data());
-}
+export const getUserCheckIns = async userId => {
+  const userDocRef = doc(userCollection, userId);
+  const checkInsCollection = collection(userDocRef, "userCheckIns");
+  const checkInsSnapshot = await getDocs(checkInsCollection);
+  return checkInsSnapshot.docs.map(doc => doc.data());
+};
 
 export const updateUserLessonProgress = async (userId, lessonId) => {
-    const userRef = doc(userCollection, userId);
-    return await updateDoc(userRef, {
-        completedLessons: arrayUnion(lessonId)
-    });
-}
+  const userRef = doc(userCollection, userId);
+  return await updateDoc(userRef, {
+    completedLessons: arrayUnion(lessonId)
+  });
+};
 
 export const unlockIngredientForUser = async (userId, ingredientId) => {
-    const userRef = doc(userCollection, userId);
-    return await updateDoc(userRef, {
-        unlockedIngredients: arrayUnion(ingredientId)
-    });
-}
+  const userRef = doc(userCollection, userId);
+  return await updateDoc(userRef, {
+    unlockedIngredients: arrayUnion(ingredientId)
+  });
+};
 
 export const unlockRecipeForUser = async (userId, recipeId) => {
-    const userRef = doc(userCollection, userId);
-    return await updateDoc(userRef, {
-        unlockedRecipes: arrayUnion(recipeId)
-    });
-}
+  const userRef = doc(userCollection, userId);
+  return await updateDoc(userRef, {
+    unlockedRecipes: arrayUnion(recipeId)
+  });
+};
+
+export const resetCheckIns = async userId => {
+  const userRef = doc(userCollection, userId);
+  await updateDoc(userRef, {
+    consecutiveCheckIns: 0,
+    lastCheckInDate: null
+  });
+};

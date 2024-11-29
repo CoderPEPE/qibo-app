@@ -20,6 +20,7 @@ import {
 import GoogleSignInButton from "../../components/googleSignInButton";
 import { useAtom } from "jotai";
 import userInfoAtom from "../../store/userInfo";
+import { addUser, getUserData } from "../../db/users";
 
 const SigninScreen = ({ navigation }) => {
   const [state, setState] = useState({
@@ -70,13 +71,21 @@ const SigninScreen = ({ navigation }) => {
       passwordErrorMessage: ""
     });
     signInWithEmailAndPassword(FIREBASE_AUTH, emailAddress, password)
-      .then(userCredential => {
-        console.log("User ID: ", userCredential.user.uid);
+      .then(async userCredential => {
         const updatedUserCredential = userCredential;
         updatedUserCredential.user.displayName = updatedUserCredential.user.email.split("@")[0].charAt(0).toUpperCase() + updatedUserCredential.user.email.split("@")[0].slice(1);
         updatedUserCredential.user.photoURL = "https://www.asirox.com/wp-content/uploads/2022/07/depositphotos_90647730-stock-illustration-female-doctor-avatar-icon.webp";
         setUserInfo({ auth: true, userCredential: updatedUserCredential });
-        console.log("Sign In Success", updatedUserCredential);
+        
+        try {
+          const userData = await getUserData(updatedUserCredential.user.uid);
+          if (!userData) {
+            await addUser(updatedUserCredential.user.uid, updatedUserCredential.user.email, "mail auth");
+          }
+          console.log("Sign In Success", updatedUserCredential);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       })
       .catch(error => {
         setUserInfo({ auth: false, userCredential: {} });

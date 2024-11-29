@@ -19,6 +19,7 @@ import chooseMusicScreen from "./screens/chooseMusic/chooseMusicScreen";
 import splashScreen from "./screens/splashScreen";
 import QuestionScreen from "./screens/explore/question";
 import ResultsScreen from "./screens/explore/ResultsScreen";
+import CheckInScreen from "./screens/checkinScreen/checkinScreen";
 
 LogBox.ignoreAllLogs();
 
@@ -53,6 +54,7 @@ const App = () => {
           options={{ ...TransitionPresets.DefaultTransition }}
         />
         <Stack.Screen name="Search" component={searchScreen} />
+        <Stack.Screen name="CheckInScreen" component={CheckInScreen} />
         <Stack.Screen name="Subscribe" component={subscriptionScreen} />
         <Stack.Screen
           name="ExploreSubscription"

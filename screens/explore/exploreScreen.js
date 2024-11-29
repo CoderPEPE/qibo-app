@@ -32,7 +32,7 @@ const ExploreScreen = ({ navigation }) => {
       <StatusBar backgroundColor={Colors.primaryColor} />
       <View style={{ flex: 1 }}>
         {bottomImage()}
-        
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 15.0 }}
@@ -67,8 +67,16 @@ const ExploreScreen = ({ navigation }) => {
           </Text>
         </View>
         <View style={styles.boltContainer}>
-          <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
-          <Text style={styles.notifyNumber}>11</Text>
+          <TouchableOpacity
+            style={styles.boltButton}
+            onPress={() => navigation.push("CheckInScreen")}
+          >
+            <Text style={styles.boltText}>
+              Daily Check-in{"\n"}
+              For Rewards
+            </Text>
+            <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -397,6 +405,20 @@ const styles = StyleSheet.create({
     height: 140.0,
     flexDirection: "row",
     alignItems: "center"
+  },
+  boltText: {
+    textAlign: "center",
+    marginBottom: 5,
+    ...Fonts.greenColor13SemiBold
+  },
+  todayText: {
+    textAlign: "center",
+    ...Fonts.greenColor13SemiBold
+  },
+  boltButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
 
