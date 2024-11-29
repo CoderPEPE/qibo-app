@@ -4,6 +4,8 @@ import * as Progress from 'react-native-progress';
 import { Colors, Fonts, Sizes, } from "../../constants/styles";
 import { MaterialIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
+import { useAtom } from "jotai";
+import userInfoAtom from "../../store/userInfo";
 
 const { width } = Dimensions.get('window');
 
@@ -57,13 +59,15 @@ const dinnerList = [
 ];
 const RecipeScreen = ({ navigation }) => {
 
+    const [userInfo, setUserInfo] = useAtom(userInfoAtom)
+
     const [state, setState] = useState({
         currentScreen: 0,
     });
 
-    const updateState = (data) => setState((state) => ({ ...state, ...data}));
+    const updateState = (data) => setState((state) => ({ ...state, ...data }));
 
-    const{
+    const {
         currentScreen,
     } = state;
 
@@ -71,7 +75,7 @@ const RecipeScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
             <StatusBar backgroundColor={Colors.primaryColor} />
-            <View style={{ flex: 1 }}>            
+            <View style={{ flex: 1 }}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 15.0 }}
@@ -88,137 +92,141 @@ const RecipeScreen = ({ navigation }) => {
     function header() {
         return (
             <View style={styles.headerWrapStyle}>
-                <Entypo name="chevron-thin-left" size={22} style={{marginLeft: -5, marginRight: 20}} color="black" onPress={() => {currentScreen != 0 ? updateState({currentScreen : 0}) : navigation.push('BottomTabBar', {pageView : 'main'})}}/>
+                <Entypo name="chevron-thin-left" size={22} style={{ marginLeft: -5, marginRight: 20 }} color="black" onPress={() => { currentScreen != 0 ? updateState({ currentScreen: 0 }) : navigation.push('BottomTabBar', { pageView: 'main' }) }} />
                 <View style={styles.profileContainer}>
-                    <Image source={require('../../assets/images/profile-photo.png')} style={styles.profilePhoto}/>
+                    <Image src={userInfo.userCredential.user.photoURL} style={styles.profilePhoto} />
                 </View>
                 <View style={styles.helloContainer}>
-                    <Text style={{marginTop: -15, ...Fonts.blackColor24ExtraBold}}>Recipes</Text>
+                    <Text style={{ marginTop: -15, ...Fonts.blackColor24ExtraBold }}>Recipes</Text>
                 </View>
                 <View style={styles.boltContainer}>
-                    <MaterialIcons
-                        name='bolt'
-                        size={35}
-                        color={Colors.blackColor}
-                    />
-                    <Text style={styles.notifyNumber}>11</Text>
+                    <TouchableOpacity
+                        style={styles.boltButton}
+                        onPress={() => navigation.push("CheckInScreen")}
+                    >
+                        <Text style={styles.boltText}>
+                            Daily Check-in{"\n"}
+                            For Rewards
+                        </Text>
+                        <MaterialIcons name="bolt" size={35} color={Colors.blackColor} />
+                    </TouchableOpacity>
                 </View>
             </View>
         )
     }
 
     function listView() {
-        return(
-        <View>
-            <View style={styles.mealContainer}>
-            {currentScreen == 0 &&
-                <>
-                    <TouchableOpacity 
-                        onPress={() => updateState({currentScreen: 1})}
-                        activeOpacity={0.9}
-                    >
-                        <ImageBackground
-                            source={require('../../assets/images/meal-back.png')}
-                            style={styles.mealItem}
-                            resizeMode="stretch"
-                            borderRadius={Sizes.fixPadding * 2.0}
-                        >
-                            <View style={styles.mealDetails}>
-                                <Text style={styles.mealTitle}>Breakfast</Text>
-                                <Text style={styles.mealCount}>5</Text>
-                                <Entypo name="chevron-thin-right" size={25} color="white" style={styles.mealRight}/>
-                            </View>
-                        </ImageBackground>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        onPress={() => updateState({currentScreen: 2})}
-                        activeOpacity={0.9}
-                    >
-                        <ImageBackground
-                            source={require('../../assets/images/meal-back.png')}
-                            style={styles.mealItem}
-                            resizeMode="stretch"
-                            borderRadius={Sizes.fixPadding * 2.0}
-                        >
-                            <View style={styles.mealDetails}>
-                                <Text style={styles.mealTitle}>Lunch</Text>
-                                <Text style={styles.mealCount}>2</Text>
-                                <Entypo name="chevron-thin-right" size={25} color="white" style={styles.mealRight} />
-                            </View>
-                        </ImageBackground>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                        onPress={() => updateState({currentScreen: 3})}
-                        activeOpacity={0.9}
-                    >
-                        <ImageBackground
-                            source={require('../../assets/images/meal-back.png')}
-                            style={styles.mealItem}
-                            resizeMode="stretch"
-                            borderRadius={Sizes.fixPadding * 2.0}
-                        >
-                            <View style={styles.mealDetails}>
-                                <Text style={styles.mealTitle}>Dinner</Text>
-                                <Text style={styles.mealCount}>3</Text>
-                                <Entypo name="chevron-thin-right" size={25} color="white" style={styles.mealRight}/>
-                            </View>
-                        </ImageBackground>
-                    </TouchableOpacity>
-                </>
-            }
-            {currentScreen == 1 &&
-               <FlatList
-                    data={breakfastList}
-                    keyExtractor={(item) => item.id}                    
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (                        
-                        <TouchableOpacity
-                            style={styles.foodItem}
-                            activeOpacity={0.9}
-                            onPress={() => navigation.push('BottomTabBar', {pageView : 'reciperesult'})}
-                        >
-                            <View style={styles.foodId}><Text style={{...Fonts.WhiteColor34ExtraBold}}>{item.id}</Text></View>
-                            <View style={styles.foodContainer}><Text style={{...Fonts.textGrayColor15SemiBold}}>{item.text}</Text></View>
-                        </TouchableOpacity>
-                    )}
-                />
-            }
-            {currentScreen == 2 &&
-               <FlatList
-                    data={lunchList}
-                    keyExtractor={(item) => item.id}                    
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (                        
-                        <TouchableOpacity
-                            style={styles.foodItem}
-                            activeOpacity={0.9}
-                            onPress={() => navigation.push('BottomTabBar', {pageView : 'reciperesult'})}
-                        >
-                            <View style={styles.foodId}><Text style={{...Fonts.WhiteColor34ExtraBold}}>{item.id}</Text></View>
-                            <View style={styles.foodContainer}><Text style={{...Fonts.textGrayColor15SemiBold}}>{item.text}</Text></View>
-                        </TouchableOpacity>
-                    )}
-                />
-            }
-            {currentScreen == 3 &&
-               <FlatList
-                    data={dinnerList}
-                    keyExtractor={(item) => item.id}                    
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (                        
-                        <TouchableOpacity
-                            style={styles.foodItem}
-                            activeOpacity={0.9}
-                            onPress={() => navigation.push('BottomTabBar', {pageView : 'reciperesult'})}
-                        >
-                            <View style={styles.foodId}><Text style={{...Fonts.WhiteColor34ExtraBold}}>{item.id}</Text></View>
-                            <View style={styles.foodContainer}><Text style={{...Fonts.textGrayColor15SemiBold}}>{item.text}</Text></View>
-                        </TouchableOpacity>
-                    )}
-                />
-            }
-            </View>
-        </View>)
+        return (
+            <View>
+                <View style={styles.mealContainer}>
+                    {currentScreen == 0 &&
+                        <>
+                            <TouchableOpacity
+                                onPress={() => updateState({ currentScreen: 1 })}
+                                activeOpacity={0.9}
+                            >
+                                <ImageBackground
+                                    source={require('../../assets/images/meal-back.png')}
+                                    style={styles.mealItem}
+                                    resizeMode="stretch"
+                                    borderRadius={Sizes.fixPadding * 2.0}
+                                >
+                                    <View style={styles.mealDetails}>
+                                        <Text style={styles.mealTitle}>Breakfast</Text>
+                                        <Text style={styles.mealCount}>5</Text>
+                                        <Entypo name="chevron-thin-right" size={25} color="white" style={styles.mealRight} />
+                                    </View>
+                                </ImageBackground>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => updateState({ currentScreen: 2 })}
+                                activeOpacity={0.9}
+                            >
+                                <ImageBackground
+                                    source={require('../../assets/images/meal-back.png')}
+                                    style={styles.mealItem}
+                                    resizeMode="stretch"
+                                    borderRadius={Sizes.fixPadding * 2.0}
+                                >
+                                    <View style={styles.mealDetails}>
+                                        <Text style={styles.mealTitle}>Lunch</Text>
+                                        <Text style={styles.mealCount}>2</Text>
+                                        <Entypo name="chevron-thin-right" size={25} color="white" style={styles.mealRight} />
+                                    </View>
+                                </ImageBackground>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => updateState({ currentScreen: 3 })}
+                                activeOpacity={0.9}
+                            >
+                                <ImageBackground
+                                    source={require('../../assets/images/meal-back.png')}
+                                    style={styles.mealItem}
+                                    resizeMode="stretch"
+                                    borderRadius={Sizes.fixPadding * 2.0}
+                                >
+                                    <View style={styles.mealDetails}>
+                                        <Text style={styles.mealTitle}>Dinner</Text>
+                                        <Text style={styles.mealCount}>3</Text>
+                                        <Entypo name="chevron-thin-right" size={25} color="white" style={styles.mealRight} />
+                                    </View>
+                                </ImageBackground>
+                            </TouchableOpacity>
+                        </>
+                    }
+                    {currentScreen == 1 &&
+                        <FlatList
+                            data={breakfastList}
+                            keyExtractor={(item) => item.id}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.foodItem}
+                                    activeOpacity={0.9}
+                                    onPress={() => navigation.push('BottomTabBar', { pageView: 'reciperesult' })}
+                                >
+                                    <View style={styles.foodId}><Text style={{ ...Fonts.WhiteColor34ExtraBold }}>{item.id}</Text></View>
+                                    <View style={styles.foodContainer}><Text style={{ ...Fonts.textGrayColor15SemiBold }}>{item.text}</Text></View>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    }
+                    {currentScreen == 2 &&
+                        <FlatList
+                            data={lunchList}
+                            keyExtractor={(item) => item.id}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.foodItem}
+                                    activeOpacity={0.9}
+                                    onPress={() => navigation.push('BottomTabBar', { pageView: 'reciperesult' })}
+                                >
+                                    <View style={styles.foodId}><Text style={{ ...Fonts.WhiteColor34ExtraBold }}>{item.id}</Text></View>
+                                    <View style={styles.foodContainer}><Text style={{ ...Fonts.textGrayColor15SemiBold }}>{item.text}</Text></View>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    }
+                    {currentScreen == 3 &&
+                        <FlatList
+                            data={dinnerList}
+                            keyExtractor={(item) => item.id}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.foodItem}
+                                    activeOpacity={0.9}
+                                    onPress={() => navigation.push('BottomTabBar', { pageView: 'reciperesult' })}
+                                >
+                                    <View style={styles.foodId}><Text style={{ ...Fonts.WhiteColor34ExtraBold }}>{item.id}</Text></View>
+                                    <View style={styles.foodContainer}><Text style={{ ...Fonts.textGrayColor15SemiBold }}>{item.text}</Text></View>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    }
+                </View>
+            </View>)
     }
 }
 
@@ -244,7 +252,7 @@ const styles = StyleSheet.create({
     },
     profilePhoto: {
         width: 43,
-        height: 43,       
+        height: 43,
     },
     profileContainer: {
         borderColor: Colors.pinkColor,
@@ -257,7 +265,7 @@ const styles = StyleSheet.create({
         marginLeft: Sizes.fixPadding * 1.5,
     },
     boltContainer: {
-        marginLeft: 'auto',        
+        marginLeft: 'auto',
         position: 'relative',
     },
     notifyNumber: {
@@ -273,8 +281,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         shadowColor: '#0005',
         shadowOffset: {
-        width: 0,
-        height: 4,
+            width: 0,
+            height: 4,
         },
         shadowOpacity: 0.5,
         elevation: 5,
@@ -283,9 +291,9 @@ const styles = StyleSheet.create({
     mealContainer: {
 
     },
-    mealDetails:{
+    mealDetails: {
         flexDirection: 'row',
-        alignItems: 'center',        
+        alignItems: 'center',
     },
     mealItem: {
         marginHorizontal: Sizes.fixPadding * 0.8,
@@ -331,7 +339,17 @@ const styles = StyleSheet.create({
     foodContainer: {
         width: Sizes.fixPadding * 22,
         marginLeft: Sizes.fixPadding * 2.0,
-    }
+    },
+    boltButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    boltText: {
+        textAlign: "center",
+        marginBottom: 5,
+        ...Fonts.greenColor13SemiBold
+    },
 })
 
 export default RecipeScreen;
