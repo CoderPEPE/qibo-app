@@ -20,7 +20,7 @@ import splashScreen from "./screens/splashScreen";
 import QuestionScreen from "./screens/explore/question";
 import ResultsScreen from "./screens/explore/ResultsScreen";
 import CheckInScreen from "./screens/checkinScreen/checkinScreen";
-
+import exploreScreen from "./screens/explore/exploreScreen";
 LogBox.ignoreAllLogs();
 
 const Stack = createSharedElementStackNavigator();
@@ -54,6 +54,7 @@ const App = () => {
           options={{ ...TransitionPresets.DefaultTransition }}
         />
         <Stack.Screen name="Search" component={searchScreen} />
+        <Stack.Screen name="Explore" component={exploreScreen} />
         <Stack.Screen name="CheckInScreen" component={CheckInScreen} />
         <Stack.Screen name="Subscribe" component={subscriptionScreen} />
         <Stack.Screen
