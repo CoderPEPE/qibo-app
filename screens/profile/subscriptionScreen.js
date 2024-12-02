@@ -8,13 +8,14 @@ import {
   Image,
   Text,
   StyleSheet,
-  ImageBackground
+  ImageBackground,
+  Alert
 } from "react-native";
 import { Colors, Fonts, Sizes } from "../../constants/styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
-// import StripeProvider, { useStripe } from "@stripe/stripe-react-native";
+import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
 
 const subscribePackageList = [
   {
@@ -45,64 +46,73 @@ const subscriptionAllowsList = [
 ];
 
 const subscriptionScreen = ({ navigation }) => {
-//   const stripe = useStripe();
-//   const subscribe = async (amount) => {
-//     try {
-//       const response = await fetch("http://localhost:8080/payment", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify({ amount })
-//       });
-//       const data = await response.json();
-//       console.log(data);
-//       if (!response.ok)
-//         return Alert.alert(
-//           "Something went wrong, try again later",
-//           data.message
-//         );
-//       const { clientSecret } = data.clientSecret;
-//       const initSheet = await stripe.initPaymentSheet({
-//         paymentIntentClientSecret: clientSecret
-//       });
-//       if (initSheet.error)
-//         return Alert.alert(
-//           "Something went wrong, try again",
-//           initSheet.error.message
-//         );
-//       const paymentSheet = await stripe.presentPaymentSheet({
-//         clientSecret
-//       });
-//       if (paymentSheet.error)
-//         return Alert.alert(
-//           "Something went wrong, try",
-//           paymentSheet.error.message
-//         );
-//       Alert.alert("Payment successful");
-//     } catch (error) {
-//       console.log(error);
-//       Alert.alert("Something went wrong", error.message);
-//     }
-//   };
+  const stripe = useStripe();
+  const subscribe = async amount => {
+    console.log("amount", amount);
+    try {
+      const response = await fetch("http://192.168.145.122:8080/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ amount })
+      });
+      console.log("response", response);
+      const data = await response.json();
+      console.log("data", data);
+      if (!response.ok)
+        return Alert.alert(
+          "Something went wrong, try again later",
+          data.message
+        );
+      const clientSecret = data.clientSecret;
+      console.log("clientSecret", clientSecret);
+      const initSheet = await stripe.initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        merchantDisplayName: "acct_1QP0tTJQw8dbDvmU"
+      });
+      console.log("initSheet", initSheet);
+      if (initSheet.error)
+        return Alert.alert(
+          "Something went wrong, try again",
+          initSheet.error.message
+        );
+      const paymentSheet = await stripe.presentPaymentSheet({
+        clientSecret
+      });
+      if (paymentSheet.error)
+        return Alert.alert(
+          "Something went wrong, try",
+          paymentSheet.error.message
+        );
+        Alert.alert("Payment successful", "", [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("ExploreSubscription")
+          }
+        ]);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Something went wrong", error.message);
+    }
+  };
 
   return (
-    // <StripeProvider publishableKey="sk_test_51JLlrQSCrqIF8lRiuhSYY7MVJSgCX6UwcuCBpj1uXQCqGncGi4KA9Zbsa9cj42TtuaNd8fN8QMu0YPXEjT6veHiY00RqWsKaoE">
-
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
-      <StatusBar backgroundColor={Colors.primaryColor} />
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 7.0 }}
-        >
-          {header()}
-          {packages()}
-          {subscriptionAllowsInfo()}
-        </ScrollView>
-      </View>
+    <StripeProvider publishableKey="pk_test_51QP0tTJQw8dbDvmUrpqJ4b4iMTwxo8eqaN4IVKkimM7mVN6aVGtjsQ1e7ccqEfE2AxF6GPWEAtzFqkiaNbOD89rS00dGOmDsE2">
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backColor }}>
+        <StatusBar backgroundColor={Colors.primaryColor} />
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: Sizes.fixPadding * 7.0 }}
+          >
+            {header()}
+            {packages()}
+            {subscriptionAllowsInfo()}
+          </ScrollView>
+        </View>
       </SafeAreaView>
-    // </StripeProvider>
+    </StripeProvider>
   );
 
   function subscriptionAllowsInfo() {
@@ -151,43 +161,43 @@ const subscriptionScreen = ({ navigation }) => {
   function packages() {
     return subscribePackageList.map(item =>
       <View key={`${item.id}`}>
-          <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.push("ExploreSubscription")}>
-            <ImageBackground
-              source={require("../../assets/images/card-design.png")}
+        <TouchableOpacity activeOpacity={0.9} onPress={() => subscribe(10)}>
+          <ImageBackground
+            source={require("../../assets/images/card-design.png")}
+            style={{
+              marginHorizontal: Sizes.fixPadding * 2.0,
+              height: 130.0,
+              marginBottom: Sizes.fixPadding + 5.0
+            }}
+            borderRadius={Sizes.fixPadding - 5.0}
+          >
+            <View
               style={{
+                marginBottom: Sizes.fixPadding + 5.0,
                 marginHorizontal: Sizes.fixPadding * 2.0,
-                height: 130.0,
-                marginBottom: Sizes.fixPadding + 5.0
+                justifyContent: "flex-end",
+                flex: 1
               }}
-              borderRadius={Sizes.fixPadding - 5.0}
             >
-              <View
+              <Text
                 style={{
-                  marginBottom: Sizes.fixPadding + 5.0,
-                  marginHorizontal: Sizes.fixPadding * 2.0,
-                  justifyContent: "flex-end",
-                  flex: 1
+                  marginBottom: Sizes.fixPadding - 8.0,
+                  ...Fonts.whiteColor15SemiBold
                 }}
               >
-                <Text
-                  style={{
-                    marginBottom: Sizes.fixPadding - 8.0,
-                    ...Fonts.whiteColor15SemiBold
-                  }}
-                >
-                  {item.packType}
-                </Text>
-                <Text style={{ ...Fonts.whiteColor22Light }}>
-                  {item.validityInMonths} MONTHS
-                </Text>
-                <Text
-                  style={{ alignSelf: "flex-end", ...Fonts.whiteColor22Light }}
-                >
-                  $ {item.amount}
-                </Text>
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
+                {item.packType}
+              </Text>
+              <Text style={{ ...Fonts.whiteColor22Light }}>
+                {item.validityInMonths} MONTHS
+              </Text>
+              <Text
+                style={{ alignSelf: "flex-end", ...Fonts.whiteColor22Light }}
+              >
+                $ {item.amount}
+              </Text>
+            </View>
+          </ImageBackground>
+        </TouchableOpacity>
       </View>
     );
   }

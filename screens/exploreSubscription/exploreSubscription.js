@@ -37,7 +37,7 @@ const ExploreSubscriptionScreen = ({ navigation }) => {
             <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => {
-                    navigation.push('PaymentFailed')
+                    navigation.push('BottomTabBar', { pageView: "main" })
                 }}
                 style={{
                     justifyContent: 'center',
